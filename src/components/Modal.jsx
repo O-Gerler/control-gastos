@@ -1,22 +1,36 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Mensaje from './Mensaje'
 import cerrarBtn from '../img/cerrar.svg'
 
 
-const Modal = ({setModal, animacion, setAnimacion, guardarGasto}) => {
+const Modal = ({setModal, animacion, setAnimacion, guardarGasto, gastoEditar, setGastoEditar}) => {
 
   const [nombre, setNombre] = useState('')
   const [cantidad, setCantidad] = useState('')
   const [categoria, setCategoria] = useState('')
+  const [id, setId] = useState('')
+  const [fecha, setFecha] = useState('')
+
   const [mensaja, setMensaje] = useState('')
   
   const ocultarModal = () => {
     setAnimacion(false)
+    setGastoEditar({})
 
     setTimeout(() => {
       setModal(false)
     }, 400)
   }
+
+  useEffect(() => {
+    if (Object.keys(gastoEditar).length > 0) {
+      setNombre(gastoEditar.nombre)
+      setCantidad(gastoEditar.cantidad)
+      setCategoria(gastoEditar.categoria)
+      setId(gastoEditar.id)
+      setFecha(gastoEditar.fecha)
+    }
+  }, [])
 
   const handleEnviar = e => {
     e.preventDefault()
@@ -31,7 +45,7 @@ const Modal = ({setModal, animacion, setAnimacion, guardarGasto}) => {
       return
     }
 
-    guardarGasto({nombre, cantidad, categoria})
+    guardarGasto({nombre, cantidad, categoria, id, fecha})
     setMensaje('')
     ocultarModal()
   }
@@ -50,10 +64,10 @@ const Modal = ({setModal, animacion, setAnimacion, guardarGasto}) => {
           className={`formulario ${animacion ? 'animar' : 'cerrar'}`}
           onSubmit={handleEnviar}  
         >
-          <legend>Nuevo Gasto</legend>
+          <legend>{gastoEditar.nombre ? 'Modificar Gasto' : 'Nuevo Gasto'}</legend>
           {mensaja !== '' && <Mensaje tipo={'error'}>{mensaja}</Mensaje>}
           <div className="campo">
-            <label htmlFor="nombre">Nuevo Gasto</label>
+            <label htmlFor="nombre">Nombre Gasto</label>
             <input 
               id='nombre'
               type="text"
@@ -89,7 +103,7 @@ const Modal = ({setModal, animacion, setAnimacion, guardarGasto}) => {
               <option value="suscripciones">Suscripciones</option>
             </select>
           </div>
-          <input type="submit" value="Agregar gasto" />
+          <input type="submit" value={gastoEditar.nombre ? 'Modificar Gasto' : 'Agregar Gasto'} />
         </form>
     </div>
   )
